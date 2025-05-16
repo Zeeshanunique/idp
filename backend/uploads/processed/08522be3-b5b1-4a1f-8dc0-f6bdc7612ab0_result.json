@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "audio",
+  "original_file": "08522be3-b5b1-4a1f-8dc0-f6bdc7612ab0.wav",
+  "processing_time": "13.58 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "I've transcribed the audio and extracted the following information:\n\n## Audio Transcript\nThe stale smell of old beer lingers.  It takes heat to bring out the odor.  A cold dip restores health and zest.  A salt pickle tastes fine with ham.  Tacos al pastor are my favorite.  A zestful food is the hot cross bun.\n\nDetected language: en\n\n## Segment Details\n1. (0.00s - 4.00s):  The stale smell of old beer lingers.\n2. (4.00s - 7.00s):  It takes heat to bring out the odor.\n3. (7.00s - 10.00s):  A cold dip restores health and zest.\n4. (10.00s - 12.00s):  A salt pickle tastes fine with ham.\n5. (12.00s - 15.00s):  Tacos al pastor are my favorite.\n... 1 more segments\n\n",
+    "agent_type": "audio",
+    "timestamp": 1744140057.1804125,
+    "processed_file": "/workspaces/demo_crew/backend/uploads/audio/08522be3-b5b1-4a1f-8dc0-f6bdc7612ab0.wav"
+  }
+}

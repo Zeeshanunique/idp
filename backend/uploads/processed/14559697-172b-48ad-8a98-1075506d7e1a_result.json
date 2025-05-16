@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "text",
+  "original_file": "14559697-172b-48ad-8a98-1075506d7e1a.png",
+  "processing_time": "2.90 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "Error processing file: Unsupported file type: .png",
+    "agent_type": "text",
+    "timestamp": 1744113460.2309852,
+    "processed_file": "/workspaces/demo_crew/backend/uploads/text/14559697-172b-48ad-8a98-1075506d7e1a.png"
+  }
+}

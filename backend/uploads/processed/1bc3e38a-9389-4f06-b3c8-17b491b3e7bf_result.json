@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "audio",
+  "original_file": "1bc3e38a-9389-4f06-b3c8-17b491b3e7bf.m4a",
+  "processing_time": "63.51 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "The audio transcription is as follows:\n\n\"So, the problem statement that we get under mystery, mystery theme is to build an autonomous document intelligence where the users have to upload documents of different kinds which will be multi models. Through our application, we will give you the dataset in a different format, whether it will be an organization or the CSB. To achieve this milestone, we have to use different AI frameworks like Creway, Langchen. Before we started to build through Creway, but we did not succeed in that. So, we converted our frameworks into Langchen. This is the code that we have written, consisting of the backend and the frontend part. In the frontend, we have used next years that sadgian components and normal televisions for designing. For the backend, we have used Langchen. There is a master agent, a main file, and we have used Langgraph to orchestrate different kinds of agents and tools. We have audio tools, custom tools, image tools, text tools, and video tools. Each tool's functionality is for working under different data formats, whether in a text format, PDF, CSV, or JSON file. It also uses vector storage for embeddings and understanding the data after extraction. We are using open source tools like paddle OCR and LLMs from OpenAI. For image tools, we have implemented Mistral AI, one of the best OCR in the market. For video tools, we are using CV2 to understand the video. The purpose of creating the video agent is for transcriptions when users upload videos. The audio tools use faster Whisper, which is better than Whisper by OpenAI. Once you upload images, the master agent will decide which tools to use and instruct the agent to perform the task. The output is obtained from the image uploaded using OCR. The orchestration is done for data creation, and the application will create a dataset using the data shown. Users can interact with the data, convert data types, add, work with schemas, and more. The next milestone is to integrate dataset conversation and manipulations, evaluate pricing using languagemith, track token charges, and ensure security for sensitive data using guardians. The last milestone is to use model context protocol (MCP).\"\n\nLanguage: English",
+    "agent_type": "audio",
+    "timestamp": 1744137429.7723172,
+    "processed_file": "/workspaces/demo_crew/backend/uploads/audio/1bc3e38a-9389-4f06-b3c8-17b491b3e7bf.m4a"
+  }
+}

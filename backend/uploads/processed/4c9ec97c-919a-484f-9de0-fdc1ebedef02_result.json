@@ -1,0 +1,25 @@
+{
+  "status": "completed",
+  "file_type": "image",
+  "original_file": "4c9ec97c-919a-484f-9de0-fdc1ebedef02.png",
+  "processing_time": "0.33 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": {
+      "ocr_results": [],
+      "vision_analysis": {
+        "extracted_text": "Error processing image from C:\\Users\\dell\\Desktop\\demo_crew\\backend\\uploads\\image\\4c9ec97c-919a-484f-9de0-fdc1ebedef02.png: Missing LangChain dependencies"
+      },
+      "metadata": {
+        "file_name": "4c9ec97c-919a-484f-9de0-fdc1ebedef02.png",
+        "file_extension": ".png",
+        "file_size": 23359,
+        "last_modified": 1747424292.402084,
+        "file_path": "C:\\Users\\dell\\Desktop\\demo_crew\\backend\\uploads\\image\\4c9ec97c-919a-484f-9de0-fdc1ebedef02.png"
+      }
+    },
+    "agent_type": "image",
+    "timestamp": "2025-05-17T01:08:12.784719",
+    "processed_file": "C:\\Users\\dell\\Desktop\\demo_crew\\backend\\uploads\\image\\4c9ec97c-919a-484f-9de0-fdc1ebedef02.png"
+  }
+}

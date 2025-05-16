@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "image",
+  "original_file": "2cf50d81-5020-4d03-af7c-c26c7911f53a.png",
+  "processing_time": "0.01 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "Error: This event loop is already running",
+    "agent_type": "image",
+    "timestamp": "2025-05-17T00:59:19.019768",
+    "processed_file": "C:\\Users\\dell\\Desktop\\demo_crew\\backend\\uploads\\image\\2cf50d81-5020-4d03-af7c-c26c7911f53a.png"
+  }
+}

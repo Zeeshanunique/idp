@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "image",
+  "original_file": "1de4786d-6b1b-439c-976a-4e66304254fb.png",
+  "processing_time": "1.01 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "Processed 1de4786d-6b1b-439c-976a-4e66304254fb.png content",
+    "agent_type": "image",
+    "timestamp": 1747420826.0868924,
+    "processed_file": "C:\\Users\\dell\\Desktop\\demo_crew\\backend\\uploads\\image\\1de4786d-6b1b-439c-976a-4e66304254fb.png"
+  }
+}

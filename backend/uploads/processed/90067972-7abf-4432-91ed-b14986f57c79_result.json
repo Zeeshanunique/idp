@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "image",
+  "original_file": "90067972-7abf-4432-91ed-b14986f57c79.png",
+  "processing_time": "11.93 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "I've analyzed the image and extracted the following information:\n\n## Extracted Text\nIt was the best of.. times, it was the worst of times, it was the age of wisdom, it was the age of foolishness....\n\n## Color Analysis\nDominant colors in the image:\n1. #fefefe (86.3% of image)\n2. #1b1b1b (8.6% of image)\n3. #c7c7c7 (1.8% of image)\n\n## Image Properties\nDimensions: 700x440\nAspect ratio: 1.59\nBrightness: 229.2/255\nContrast: 67.9\nFile size: 107.3 KB\n\n",
+    "agent_type": "image",
+    "timestamp": 1744114471.894037,
+    "processed_file": "/workspaces/demo_crew/backend/uploads/image/90067972-7abf-4432-91ed-b14986f57c79.png"
+  }
+}

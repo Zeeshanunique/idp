@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "image",
+  "original_file": "dae3e028-7f37-412b-a0a5-1b4b7d515e7a.png",
+  "processing_time": "11.72 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "I've analyzed the image and extracted the following information:\n\n## Extracted Text\nThis is a Iot of 12 point text to test the ocr code and see if it works on all types of file format.. The quick brown dog jumped over the lazy fox. The quick brown dog jumped. over the lazy fox. The quick brown dog jumped over the lazy fox. The quick brown dog jumped over the lazy fox.\n\n## Image Properties\nDimensions: 640x480\nAspect ratio: 1.33\nBrightness: 230.9/255\nContrast: 74.6\nFile size: 22.8 KB\n\n",
+    "agent_type": "image",
+    "timestamp": 1744116687.423306,
+    "processed_file": "/workspaces/demo_crew/backend/uploads/image/dae3e028-7f37-412b-a0a5-1b4b7d515e7a.png"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "audio",
+  "original_file": "e75dd95b-08fc-4213-ba46-f3ee492481ad.png",
+  "processing_time": "10.45 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "I'm unable to transcribe the audio file at the moment due to an error. Would you like me to try again or assist you with something else?",
+    "agent_type": "audio",
+    "timestamp": 1744137343.7213728,
+    "processed_file": "/workspaces/demo_crew/backend/uploads/audio/e75dd95b-08fc-4213-ba46-f3ee492481ad.png"
+  }
+}

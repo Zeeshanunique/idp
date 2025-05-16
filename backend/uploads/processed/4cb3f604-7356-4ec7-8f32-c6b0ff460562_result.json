@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "video",
+  "original_file": "4cb3f604-7356-4ec7-8f32-c6b0ff460562.mp4",
+  "processing_time": "10.80 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "I've analyzed the video and extracted the following information:\n\n## Video Properties\nDuration: 5.37 seconds\nResolution: 270x480\nFrame rate: 30.00 fps\nTotal frames: 161\n\n## Key Frames\nExtracted 5 key frames at the following timestamps:\n1. 0.00s\n2. 1.07s\n3. 2.13s\n4. 3.20s\n5. 4.27s\n\n",
+    "agent_type": "video",
+    "timestamp": 1744105769.4650645,
+    "processed_file": "/workspaces/demo_crew/backend/uploads/video/4cb3f604-7356-4ec7-8f32-c6b0ff460562.mp4"
+  }
+}

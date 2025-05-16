@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "text",
+  "original_file": "3d0f4dbd-3906-4a3f-bdf5-b801e7d1ce5f.wav",
+  "processing_time": "2.52 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "Error processing file: Unsupported file type: .wav",
+    "agent_type": "text",
+    "timestamp": 1744140016.895136,
+    "processed_file": "/workspaces/demo_crew/backend/uploads/text/3d0f4dbd-3906-4a3f-bdf5-b801e7d1ce5f.wav"
+  }
+}

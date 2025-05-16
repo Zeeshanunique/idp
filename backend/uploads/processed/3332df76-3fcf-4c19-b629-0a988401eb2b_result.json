@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "text",
+  "original_file": "3332df76-3fcf-4c19-b629-0a988401eb2b.pdf",
+  "processing_time": "1.01 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "Processed 3332df76-3fcf-4c19-b629-0a988401eb2b.pdf content",
+    "agent_type": "text",
+    "timestamp": 1747420786.4387999,
+    "processed_file": "C:\\Users\\dell\\Desktop\\demo_crew\\backend\\uploads\\text\\3332df76-3fcf-4c19-b629-0a988401eb2b.pdf"
+  }
+}

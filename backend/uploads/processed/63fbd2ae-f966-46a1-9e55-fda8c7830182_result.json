@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "text",
+  "original_file": "63fbd2ae-f966-46a1-9e55-fda8c7830182.png",
+  "processing_time": "0.06 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "No output generated",
+    "agent_type": "text",
+    "timestamp": "2025-05-17T01:34:55.655081",
+    "processed_file": "C:\\Users\\dell\\Desktop\\demo_crew\\backend\\uploads\\text\\63fbd2ae-f966-46a1-9e55-fda8c7830182.png"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "image",
+  "original_file": "407dea99-4201-4505-8b60-437f7cb1c1bd.png",
+  "processing_time": "43.82 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "It appears that the OCR tool is also unavailable due to a missing dependency. I recommend installing the necessary dependencies to enable image analysis and text extraction. If you have any other images or tasks you'd like assistance with, please let me know.",
+    "agent_type": "image",
+    "timestamp": 1747417457.5696263,
+    "processed_file": "C:\\Users\\dell\\Desktop\\demo_crew\\backend\\uploads\\image\\407dea99-4201-4505-8b60-437f7cb1c1bd.png"
+  }
+}

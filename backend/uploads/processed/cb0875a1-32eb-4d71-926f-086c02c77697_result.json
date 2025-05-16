@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "file_type": "audio",
+  "original_file": "cb0875a1-32eb-4d71-926f-086c02c77697.wav",
+  "processing_time": "16.90 seconds",
+  "instructions": "No specific instructions provided",
+  "extracted_data": {
+    "output": "The transcription of the audio file is as follows:\n\n1. \"The stale smell of old beer lingers.\"\n2. \"It takes heat to bring out the odor.\"\n3. \"A cold dip restores health and zest.\"\n4. \"A salt pickle tastes fine with ham.\"\n5. \"Tacos al pastor are my favorite.\"\n6. \"A zestful food is the hot cross bun.\"",
+    "agent_type": "audio",
+    "timestamp": 1744128579.0681326,
+    "processed_file": "/workspaces/demo_crew/backend/uploads/audio/cb0875a1-32eb-4d71-926f-086c02c77697.wav"
+  }
+}
