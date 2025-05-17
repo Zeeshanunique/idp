@@ -20,10 +20,11 @@ export default function RootLayout({
 }) {
   const navItems = [
     { label: "Home", href: "/" },
-    // { label: "Case Files", href: "/case" },
+    { label: "Dashboard", href: "/dashboard" },
     { label: "Upload", href: "/upload" },
     { label: "Dataset", href: "/dataset" },
-    { label: "About", href: "/about" }
+    // { label: "About", href: "/about" } // Replaced by Dashboard
+    // { label: "Case Files", href: "/case" },
   ];
 
   return (

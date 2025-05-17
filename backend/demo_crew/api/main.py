@@ -12,7 +12,7 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 from demo_crew.master_agent import MasterAgent
-from .routes import upload, dataset
+from .routes import upload, dataset, metrics
 
 # Create FastAPI app
 app = FastAPI(
@@ -34,6 +34,7 @@ app.add_middleware(
 # Include routers
 app.include_router(upload.router, prefix="/api")
 app.include_router(dataset.router, prefix="/api/dataset")
+app.include_router(metrics.router, prefix="/api")
 
 # Mount static files (for serving uploaded/processed files)
 uploads_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uploads")
@@ -95,6 +96,7 @@ async def root():
             {"path": "/api/status/{file_id}", "method": "GET", "description": "Check processing status"},
             {"path": "/api/dataset", "method": "GET", "description": "Get dataset contents"},
             {"path": "/api/capabilities", "method": "GET", "description": "Get processing capabilities"},
+            {"path": "/api/dashboard/metrics", "method": "GET", "description": "Get dashboard metrics"},
             {"path": "/api/health", "method": "GET", "description": "Health check"},
             {"path": "/simplified_dataset.json", "method": "GET", "description": "Get simplified dataset"},
         ]

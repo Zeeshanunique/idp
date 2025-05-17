@@ -1,17 +1,25 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ColorPalette } from '@/components/ui/color-swatch';
 
 export default function AboutPage() {
+  const router = useRouter();
+  
+  useEffect(() => {
+    // Redirect to the Dashboard page
+    router.push('/dashboard');
+  }, [router]);
+  
+  // Show loading state while redirecting
   return (
     <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-6">About Demo Crew</h1>
+      <h1 className="text-3xl font-bold mb-6">Redirecting to Dashboard...</h1>
       
       <div className="mb-8">
         <p className="text-lg">
-          Demo Crew is an advanced system that demonstrates various UI components and 
-          design patterns using our integrated color theme system.
+          Please wait while we redirect you to the new dashboard.
         </p>
       </div>
       

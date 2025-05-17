@@ -3,36 +3,15 @@
     {
       "output": {
         "text_processing_result": {
-          "notes": {
-            "equipment_issues": [
-              {
-                "item": "Coffee machine",
-                "status": "broken"
-              },
-              {
-                "item": "printer",
-                "status": "not responding",
-                "action_required": "Call IT support"
-              }
-            ],
-            "purchases_needed": [
-              "Pens",
-              "Paper",
-              "Sticky notes"
-            ],
-            "team_lunch": {
-              "action_required": "Check with Alex about the team lunch plan"
-            },
-            "weather": {
-              "description": "Sunny but cold"
-            }
-          },
+          "document_type": "scanned PDF",
+          "text_extraction_status": "not extractable",
+          "required_action": "OCR processing",
           "metadata": {
-            "file_name": "9353b83e-ab87-4608-bf68-25c20c559e28.pdf",
+            "file_name": "fa424057-19b1-4c8e-b13b-895b41f36c9f.pdf",
             "file_extension": ".pdf",
-            "file_size": 1155,
-            "last_modified": 1747486910.5487862,
-            "file_path": "/workspaces/idp/backend/uploads/text/9353b83e-ab87-4608-bf68-25c20c559e28.pdf"
+            "file_size": 15724544,
+            "last_modified": 1747496222.6093826,
+            "file_path": "/workspaces/idp/backend/uploads/text/fa424057-19b1-4c8e-b13b-895b41f36c9f.pdf"
           }
         },
         "file_type": "text",
