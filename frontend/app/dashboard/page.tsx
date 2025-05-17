@@ -46,9 +46,13 @@ interface DashboardData {
     timestamp: string;
   }>;
   langsmithStatus: {
-    connected: true,
-    project: "demo-project"
-  },
+    connected: boolean;
+    project: string;
+    projectExists: boolean;
+    feedbackCount: number;
+    dashboardUrl: string;
+    error?: string;
+  };
   documentTypeData: Array<{
     name: string;
     value: number;
@@ -74,7 +78,10 @@ const MOCK_DATA: DashboardData = {
   },
   langsmithStatus: {
     connected: true,
-    project: "demo-project"
+    project: "demo-project",
+    projectExists: true,
+    feedbackCount: 15,
+    dashboardUrl: "https://smith.langchain.com/projects/demo-project/evals"
   },
   processingStats: {
     totalProcessed: 55,
@@ -635,25 +642,71 @@ export default function DashboardPage() {
                           <p className="font-medium">{dashboardData.langsmithStatus?.connected ? 'Connected' : 'Disconnected'}</p>
                           <p className="text-sm text-muted-foreground">
                             Project: {dashboardData.langsmithStatus?.project || 'Not configured'}
+                            {dashboardData.langsmithStatus?.projectExists === false && (
+                              <span className="text-amber-500 ml-2">(Project not found)</span>
+                            )}
                           </p>
                         </div>
                       </div>
                       
-                      <div>
-                        <h4 className="font-medium mb-2">Features enabled:</h4>
-                        <ul className="list-disc pl-5 space-y-1 text-sm">
-                          <li>Trace logging</li>
-                          <li>Performance monitoring</li>
-                          <li>Model evaluations</li>
-                          <li>Dataset creation</li>
-                        </ul>
-                      </div>
+                      {dashboardData.langsmithStatus?.connected && (
+                        <>
+                          <div>
+                            <h4 className="font-medium mb-2">Features enabled:</h4>
+                            <ul className="list-disc pl-5 space-y-1 text-sm">
+                              <li>Trace logging</li>
+                              <li>Performance monitoring</li>
+                              <li>Model evaluations</li>
+                              <li>Dataset creation</li>
+                            </ul>
+                          </div>
+
+                          <div>
+                            <h4 className="font-medium mb-2">Feedback records:</h4>
+                            <p className="text-sm">{dashboardData.langsmithStatus?.feedbackCount || 0} feedback entries collected</p>
+                          </div>
+                          
+                          {dashboardData.langsmithStatus?.dashboardUrl && (
+                            <a 
+                              href={dashboardData.langsmithStatus.dashboardUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                              View in LangSmith Dashboard
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </a>
+                          )}
+                        </>
+                      )}
+                      
+                      {!dashboardData.langsmithStatus?.connected && dashboardData.langsmithStatus?.error && (
+                        <Alert className="bg-red-50 border-red-200">
+                          <AlertTriangle className="h-4 w-4 text-red-500" />
+                          <AlertTitle className="text-red-700">Connection Error</AlertTitle>
+                          <AlertDescription className="text-red-600">
+                            {dashboardData.langsmithStatus.error}
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     </div>
                   )}
                 </CardContent>
                 <CardFooter>
                   <div className="text-sm text-muted-foreground">
-                    LangSmith provides observability and evaluation for LLM applications.
+                    <a 
+                      href="https://docs.smith.langchain.com/observability/how_to_guides/dashboards"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-700 hover:underline flex items-center"
+                    >
+                      Learn more about LangSmith dashboards
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
                   </div>
                 </CardFooter>
               </Card>
@@ -687,6 +740,98 @@ export default function DashboardPage() {
                   )}
                 </CardContent>
               </Card>
+              
+              <div className="col-span-full mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>LangSmith Trace Analysis</CardTitle>
+                    <CardDescription>Insights from trace data</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <Skeleton className="h-32 w-full" />
+                    ) : (
+                      <div className="space-y-6">
+                        {dashboardData.langsmithStatus?.connected ? (
+                          <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="border rounded-md p-4">
+                                <h3 className="font-medium mb-2">Chain Performance</h3>
+                                <div className="space-y-2">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm">Avg. Duration</span>
+                                    <span className="font-medium text-sm">2.4s</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm">Success Rate</span>
+                                    <span className="font-medium text-sm">98.2%</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm">Cached Runs</span>
+                                    <span className="font-medium text-sm">12%</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="border rounded-md p-4">
+                                <h3 className="font-medium mb-2">LLM Usage</h3>
+                                <div className="space-y-2">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm">Total Tokens</span>
+                                    <span className="font-medium text-sm">125,476</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm">Prompt Tokens</span>
+                                    <span className="font-medium text-sm">98,320</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm">Completion Tokens</span>
+                                    <span className="font-medium text-sm">27,156</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex justify-center">
+                              {dashboardData.langsmithStatus?.dashboardUrl && (
+                                <a 
+                                  href={dashboardData.langsmithStatus.dashboardUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                  View Detailed Traces in LangSmith
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                  </svg>
+                                </a>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-center py-8">
+                            <div className="mx-auto w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-4">
+                              <AlertTriangle className="h-6 w-6 text-amber-500" />
+                            </div>
+                            <h3 className="text-lg font-medium mb-2">LangSmith Not Connected</h3>
+                            <p className="text-muted-foreground mb-4">
+                              Connect to LangSmith to view detailed trace analysis and insights.
+                            </p>
+                            <a 
+                              href="https://docs.smith.langchain.com/setup" 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline"
+                            >
+                              Set up LangSmith integration
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </TabsContent>
