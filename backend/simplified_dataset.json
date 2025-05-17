@@ -2,22 +2,28 @@
   "results": [
     {
       "output": {
-        "text_processing_result": {
-          "document_type": "scanned PDF",
-          "text_extraction_status": "not extractable",
-          "required_action": "OCR processing",
-          "metadata": {
-            "file_name": "fa424057-19b1-4c8e-b13b-895b41f36c9f.pdf",
-            "file_extension": ".pdf",
-            "file_size": 15724544,
-            "last_modified": 1747496222.6093826,
-            "file_path": "/workspaces/idp/backend/uploads/text/fa424057-19b1-4c8e-b13b-895b41f36c9f.pdf"
-          }
+        "ocr_results": [],
+        "vision_analysis": {
+          "text": [
+            "This is a lot of 12 point text to test the",
+            "ocr code and see if it works on all types",
+            "of file format.",
+            "The quick brown dog jumped over the",
+            "lazy fox. The quick brown dog jumped",
+            "over the lazy fox. The quick brown dog",
+            "jumped over the lazy fox. The quick",
+            "brown dog jumped over the lazy fox."
+          ]
         },
-        "file_type": "text",
-        "mime_type": "application/pdf"
+        "metadata": {
+          "file_name": "b907bc82-60ce-44c8-bc9b-e9af37ee3090.png",
+          "file_extension": ".png",
+          "file_size": 23359,
+          "last_modified": 1747516808.395913,
+          "file_path": "C:\\Users\\dell\\Desktop\\idp\\backend\\uploads\\image\\b907bc82-60ce-44c8-bc9b-e9af37ee3090.png"
+        }
       },
-      "agent_type": "text"
+      "agent_type": "image"
     }
   ]
 }

@@ -26,10 +26,10 @@ interface DashboardData {
     lastProcessed: string;
   };
   modelPerformance: {
-    accuracy: number;
-    completeness: number;
-    consistency: number;
-    reliability: number;
+    accuracy: string;
+    completeness: string;
+    consistency: string;
+    reliability: string;
   };
   privacyRisk: {
     overall: string;
@@ -38,30 +38,30 @@ interface DashboardData {
     dataRetentionCompliance: string;
     recommendations: string[];
   };
-  activityLog: {
-    id: number;
+  activityLog: Array<{
+    id: string;
     type: string;
+    filename: string;
     status: string;
     timestamp: string;
-    filename: string;
-  }[];
-  documentTypeData: {
+  }>;
+  langsmithStatus: {
+    connected: true,
+    project: "demo-project"
+  },
+  documentTypeData: Array<{
     name: string;
     value: number;
     color: string;
-  }[];
-  processingTimeData: {
+  }>;
+  processingTimeData: Array<{
     name: string;
     time: number;
-  }[];
-  weeklyActivity: {
+  }>;
+  weeklyActivity: Array<{
     day: string;
     count: number;
-  }[];
-  langsmithStatus?: {
-    connected: boolean;
-    project: string;
-  };
+  }>;
 }
 
 // Fake data for demonstration
@@ -72,6 +72,10 @@ const MOCK_DATA: DashboardData = {
     audio: 11,
     video: 3
   },
+  langsmithStatus: {
+    connected: true,
+    project: "demo-project"
+  },
   processingStats: {
     totalProcessed: 55,
     successRate: 94.5,
@@ -79,10 +83,10 @@ const MOCK_DATA: DashboardData = {
     lastProcessed: '2025-05-17T10:23:45Z'
   },
   modelPerformance: {
-    accuracy: 91.2,
-    completeness: 87.5,
-    consistency: 89.8,
-    reliability: 92.3
+    accuracy: "91.2",
+    completeness: "87.5",
+    consistency: "89.8",
+    reliability: "92.3"
   },
   privacyRisk: {
     overall: 'Low',
@@ -95,11 +99,11 @@ const MOCK_DATA: DashboardData = {
     ]
   },
   activityLog: [
-    { id: 1, type: 'text', status: 'success', timestamp: '2025-05-17T13:42:15Z', filename: 'financial_report.pdf' },
-    { id: 2, type: 'audio', status: 'success', timestamp: '2025-05-17T12:36:10Z', filename: 'meeting_recording.m4a' },
-    { id: 3, type: 'image', status: 'warning', timestamp: '2025-05-17T11:15:23Z', filename: 'contract_scan.png' },
-    { id: 4, type: 'text', status: 'success', timestamp: '2025-05-17T10:52:08Z', filename: 'legal_document.docx' },
-    { id: 5, type: 'audio', status: 'success', timestamp: '2025-05-17T09:27:45Z', filename: 'interview.wav' }
+    { id: "1", type: 'text', status: 'success', timestamp: '2025-05-17T13:42:15Z', filename: 'financial_report.pdf' },
+    { id: "2", type: 'audio', status: 'success', timestamp: '2025-05-17T12:36:10Z', filename: 'meeting_recording.m4a' },
+    { id: "3", type: 'image', status: 'warning', timestamp: '2025-05-17T11:15:23Z', filename: 'contract_scan.png' },
+    { id: "4", type: 'text', status: 'success', timestamp: '2025-05-17T10:52:08Z', filename: 'legal_document.docx' },
+    { id: "5", type: 'audio', status: 'success', timestamp: '2025-05-17T09:27:45Z', filename: 'interview.wav' }
   ],
   documentTypeData: [
     { name: 'Text', value: 24, color: '#3b82f6' },
@@ -133,10 +137,38 @@ const privacyRiskColors = {
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState(MOCK_DATA);
+  const [dashboardData, setDashboardData] = useState<DashboardData>(MOCK_DATA);
+  const [formattedDates, setFormattedDates] = useState<Record<string, string>>({});
   const [showInfoBanner, setShowInfoBanner] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [displayTime, setDisplayTime] = useState<string>('');
+  const [activityTimes, setActivityTimes] = useState<{[key: string]: string}>({});
+
+  useEffect(() => {
+    setDisplayTime(lastUpdated.toLocaleString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    }));
+
+    // Format activity timestamps
+    if (dashboardData?.activityLog) {
+      const newActivityTimes: { [key: string]: string } = {};
+      dashboardData.activityLog.forEach(activity => {
+        if (activity.id && activity.timestamp) {
+          newActivityTimes[activity.id] = new Date(activity.timestamp).toLocaleString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+          });
+        }
+      });
+      setActivityTimes(newActivityTimes);
+    }
+  }, [lastUpdated, dashboardData?.activityLog]);
 
   // Fetch dashboard data from API
   const fetchData = async () => {
@@ -186,9 +218,35 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [autoRefresh]);
 
+  // Format dates on client-side only
+  useEffect(() => {
+    const newFormattedDates: {[key: string]: string} = {};
+    dashboardData.activityLog?.forEach(log => {
+      newFormattedDates[log.timestamp] = new Date(log.timestamp).toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+    });
+    if (dashboardData.processingStats?.lastProcessed) {
+      newFormattedDates[dashboardData.processingStats.lastProcessed] = 
+        new Date(dashboardData.processingStats.lastProcessed).toLocaleString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+    }
+    setFormattedDates(newFormattedDates);
+  }, [dashboardData]);
+
   // Format timestamp to readable date
   const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString();
+    if (formattedDates[timestamp]) {
+      return formattedDates[timestamp];
+    }
+    return timestamp; // Return raw timestamp during SSR
   };
 
   // Get appropriate icon for document type
@@ -245,7 +303,7 @@ export default function DashboardPage() {
         <div className="flex items-center space-x-4 mt-4 sm:mt-0">
           <div className="flex items-center text-sm">
             <span className="text-muted-foreground mr-2">Last updated:</span>
-            <span>{lastUpdated.toLocaleTimeString()}</span>
+            <span suppressHydrationWarning>{displayTime}</span>
           </div>
           
           <button 
@@ -512,7 +570,7 @@ export default function DashboardPage() {
                         <span>Accuracy</span>
                         <span className="font-semibold">{dashboardData.modelPerformance.accuracy}%</span>
                       </div>
-                      <Progress value={dashboardData.modelPerformance.accuracy} className="h-2" />
+                      <Progress value={parseFloat(dashboardData.modelPerformance.accuracy)} className="h-2" />
                       <p className="text-sm text-muted-foreground">
                         Measures how correct the model's outputs are against a ground truth.
                       </p>
@@ -523,7 +581,7 @@ export default function DashboardPage() {
                         <span>Completeness</span>
                         <span className="font-semibold">{dashboardData.modelPerformance.completeness}%</span>
                       </div>
-                      <Progress value={dashboardData.modelPerformance.completeness} className="h-2" />
+                      <Progress value={parseFloat(dashboardData.modelPerformance.completeness)} className="h-2" />
                       <p className="text-sm text-muted-foreground">
                         Evaluates how thoroughly the model processes all aspects of a document.
                       </p>
@@ -534,7 +592,7 @@ export default function DashboardPage() {
                         <span>Consistency</span>
                         <span className="font-semibold">{dashboardData.modelPerformance.consistency}%</span>
                       </div>
-                      <Progress value={dashboardData.modelPerformance.consistency} className="h-2" />
+                      <Progress value={parseFloat(dashboardData.modelPerformance.consistency)} className="h-2" />
                       <p className="text-sm text-muted-foreground">
                         Measures how consistently the model delivers similar results for similar inputs.
                       </p>
@@ -545,7 +603,7 @@ export default function DashboardPage() {
                         <span>Reliability</span>
                         <span className="font-semibold">{dashboardData.modelPerformance.reliability}%</span>
                       </div>
-                      <Progress value={dashboardData.modelPerformance.reliability} className="h-2" />
+                      <Progress value={parseFloat(dashboardData.modelPerformance.reliability)} className="h-2" />
                       <p className="text-sm text-muted-foreground">
                         Assesses the model's ability to perform without errors or failures over time.
                       </p>
@@ -774,7 +832,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="text-sm text-muted-foreground mt-2 md:mt-0">
-                        {formatDate(activity.timestamp)}
+                        <span suppressHydrationWarning>{activityTimes[activity.id] || ''}</span>
                       </div>
                     </div>
                   ))}

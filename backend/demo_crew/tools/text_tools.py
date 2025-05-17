@@ -13,7 +13,7 @@ from .langchain_utils import (
     create_prompt, 
     run_llm_chain, 
     LANGCHAIN_AVAILABLE,
-    ChatPrompTemplate
+    ChatPromptTemplate
 )
 
 from .base_processor import BaseProcessor

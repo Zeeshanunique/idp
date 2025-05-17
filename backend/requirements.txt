@@ -7,11 +7,11 @@ requests==2.31.0
 
 # LangChain and LangSmith - pinned versions with compatible dependencies
 # Use more flexible version ranges to avoid conflicts
-langchain
-langchain-core
-langchain-openai
-langchain-community
-langsmith
+langchain>=0.1.0
+langchain-core>=0.1.8
+langchain-openai>=0.0.5
+langchain-community>=0.0.13
+langsmith>=0.0.69
 
 # File processing dependencies
 openai>=1.3.0,<2.0.0
@@ -42,3 +42,8 @@ pyyaml>=6.0.1
 
 paddleocr
 pydub
+
+paddlepaddle 
+paddleocr 
+Pillow 
+numpy
