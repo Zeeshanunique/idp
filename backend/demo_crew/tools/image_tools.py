@@ -39,7 +39,7 @@ class ImageProcessor(BaseProcessor):
         
         # Initialize the language model using our utility function
         self.llm = get_llm(
-            model_name="gpt-4-vision-preview",
+            model_name="gpt-4o",
             temperature=0.2,
             max_tokens=1500
         )

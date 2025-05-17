@@ -10,8 +10,21 @@ def main():
     """
     # Load environment variables from .env file
     env_path = Path(__file__).parent / ".env"
-    if env_path.exists():
-        load_dotenv(dotenv_path=env_path)
+    env_new_path = Path(__file__).parent / ".env.new"
+    
+    # Try loading from different env files
+    if env_new_path.exists():
+        print(f"Loading environment from {env_new_path}")
+        load_dotenv(dotenv_path=env_new_path, override=True)
+    elif env_path.exists():
+        print(f"Loading environment from {env_path}")
+        load_dotenv(dotenv_path=env_path, override=True)
+    
+    # Print OpenAI API key status (first few and last few chars)
+    api_key = os.environ.get("OPENAI_API_KEY", "")
+    if api_key:
+        masked_key = api_key[:6] + "..." + api_key[-4:] if len(api_key) > 10 else "Invalid"
+        print(f"OpenAI API key loaded: {masked_key}")
     
     # Get the port from environment or default to 8000
     port = int(os.environ.get("PORT", 8000))

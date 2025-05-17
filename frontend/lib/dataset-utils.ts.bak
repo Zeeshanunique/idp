@@ -1,8 +1,43 @@
-// filepath: /workspaces/idp/frontend/lib/dataset-utils.ts
 import { saveAs } from 'file-saver';
 
-export interface DatasetItem {
-  output: any; // Changed from string to any to handle different types
+export inte// Convert datase// Convert dataset to XML format
+export function datasetToXml(dataset: Dataset): string {
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<dataset>\n';
+  
+  dataset.results.forEach(item => {
+    // Safely convert output to string if it's not already
+    const outputStr = typeof item.output === 'string' 
+      ? item.output 
+      : JSON.stringify(item.output);
+      
+    xml += '  <r>\n';
+    xml += `    <agent_type>${escapeXml(item.agent_type)}</agent_type>\n`;
+    xml += `    <o>${escapeXml(outputStr)}</o>\n`;
+    xml += '  </r>\n';
+  });
+  
+  xml += '</dataset>';
+  return xml;
+}
+export function datasetToXml(dataset: Dataset): string {
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<dataset>\n';
+  
+  dataset.results.forEach(item => {
+    // Handle case when output isn't a string
+    const outputValue = item.output;
+    
+    xml += '  <r>\n';
+    xml += `    <agent_type>${escapeXml(item.agent_type)}</agent_type>\n`;
+    xml += `    <o>${escapeXml(outputValue)}</o>\n`;
+    xml += '  </r>\n';
+  });
+  
+  xml += '</dataset>';
+  return xml;
+}em {
+  output: string;
   agent_type: string;
 }
 
@@ -54,15 +89,10 @@ export function datasetToXml(dataset: Dataset): string {
   xml += '<dataset>\n';
   
   dataset.results.forEach(item => {
-    // Safely convert output to string if it's not already
-    const outputStr = typeof item.output === 'string' 
-      ? item.output 
-      : JSON.stringify(item.output);
-      
-    xml += '  <r>\n';
+    xml += '  <result>\n';
     xml += `    <agent_type>${escapeXml(item.agent_type)}</agent_type>\n`;
-    xml += `    <o>${escapeXml(outputStr)}</o>\n`;
-    xml += '  </r>\n';
+    xml += `    <output>${escapeXml(item.output)}</output>\n`;
+    xml += '  </result>\n';
   });
   
   xml += '</dataset>';
@@ -72,7 +102,7 @@ export function datasetToXml(dataset: Dataset): string {
 // Helper function to escape XML special characters
 function escapeXml(unsafe: any): string {
   // Convert to string if not already a string
-  const str = typeof unsafe === 'string' ? unsafe : String(unsafe);
+  const str = typeof unsafe === 'string' ? unsafe : JSON.stringify(unsafe);
   
   return str
     .replace(/&/g, '&amp;')

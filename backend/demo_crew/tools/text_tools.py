@@ -12,10 +12,19 @@ from .langchain_utils import (
     get_llm, 
     create_prompt, 
     run_llm_chain, 
-    LANGCHAIN_AVAILABLE
+    LANGCHAIN_AVAILABLE,
+    ChatPromptTemplate
 )
 
 from .base_processor import BaseProcessor
+
+# PDF processing
+try:
+    import PyPDF2
+    PDF_AVAILABLE = True
+except ImportError:
+    PDF_AVAILABLE = False
+    print("Warning: PyPDF2 is not available. PDF processing will be limited.")
 
 class TextProcessor(BaseProcessor):
     """Processor for text-based documents"""
@@ -71,9 +80,36 @@ Follow these guidelines:
         if instructions:
             instruction_text = f"Additional instructions: {instructions}"
             
-        # Read file content
-        with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
-            content = f.read()
+        # Read file content based on file type
+        content = ""
+        if file_ext.lower() == '.pdf':
+            # Handle PDF files specially
+            if PDF_AVAILABLE:
+                try:
+                    # Read PDF with PyPDF2
+                    with open(file_path, 'rb') as f:
+                        pdf_reader = PyPDF2.PdfReader(f)
+                        for page_num in range(len(pdf_reader.pages)):
+                            page = pdf_reader.pages[page_num]
+                            content += page.extract_text() + "\n\n"
+                    
+                    # If content is empty, PDF might be scanned/image-based
+                    if not content.strip():
+                        content = "This appears to be a scanned PDF without extractable text. OCR processing is required."
+                except Exception as e:
+                    content = f"Error extracting text from PDF: {str(e)}"
+                    print(f"PDF extraction error for {file_path}: {str(e)}")
+            else:
+                content = "PDF processing is not available. Please install PyPDF2 to enable PDF text extraction."
+        else:
+            # Read regular text files
+            try:
+                with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
+                    content = f.read()
+            except UnicodeDecodeError:
+                # Try binary mode as fallback for problematic files
+                with open(file_path, 'rb') as f:
+                    content = str(f.read())
         
         # Set up the prompt
         prompt = ChatPromptTemplate.from_messages([

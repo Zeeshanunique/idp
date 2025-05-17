@@ -114,6 +114,16 @@
   background: rgb(88, 96, 105);
 }
 
+/* Hide scrollbar but allow scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
 /* Animated background grid */
 .animated-grid {
   background-size: 50px 50px;

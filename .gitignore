@@ -7,6 +7,7 @@ __pycache__/
 
 /backend/output/
 /backend/.env
+/backend/uploads/
 
 venv
 frontend/node_modules/
