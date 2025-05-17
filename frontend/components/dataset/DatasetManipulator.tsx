@@ -176,7 +176,7 @@ export default function DatasetManipulator({ dataset, onDatasetUpdated }: Datase
         )}
 
         {/* Show API key status if one was found */}
-        {apiKey && !apiKeyLoading && (
+        {/* {apiKey && !apiKeyLoading && (
           <Alert className="bg-green-900/20 border-green-800">
             <Check className="h-4 w-4 text-green-500" />
             <AlertTitle>API Key Configured</AlertTitle>
@@ -184,7 +184,7 @@ export default function DatasetManipulator({ dataset, onDatasetUpdated }: Datase
               Your Gemini API key has been successfully configured.
             </AlertDescription>
           </Alert>
-        )}
+        )} */}
 
         <div>
           <label className="block text-sm font-medium mb-1">Update Instructions</label>

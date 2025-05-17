@@ -7,13 +7,65 @@ import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line, CartesianGrid } from 'recharts';
 import api from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Info as InfoCircle, AlertTriangle, CheckCircle, Activity, FileText, Image, Mic, Video, ShieldCheck, Clock, BarChart3, AlertOctagon } from 'lucide-react';
 
+// Define interfaces for our data structure
+interface DashboardData {
+  documentCounts: {
+    text: number;
+    image: number;
+    audio: number;
+    video: number;
+  };
+  processingStats: {
+    totalProcessed: number;
+    successRate: number;
+    averageProcessingTime: number;
+    lastProcessed: string;
+  };
+  modelPerformance: {
+    accuracy: number;
+    completeness: number;
+    consistency: number;
+    reliability: number;
+  };
+  privacyRisk: {
+    overall: string;
+    piiDetected: number;
+    sensitiveContentWarnings: number;
+    dataRetentionCompliance: string;
+    recommendations: string[];
+  };
+  activityLog: {
+    id: number;
+    type: string;
+    status: string;
+    timestamp: string;
+    filename: string;
+  }[];
+  documentTypeData: {
+    name: string;
+    value: number;
+    color: string;
+  }[];
+  processingTimeData: {
+    name: string;
+    time: number;
+  }[];
+  weeklyActivity: {
+    day: string;
+    count: number;
+  }[];
+  langsmithStatus?: {
+    connected: boolean;
+    project: string;
+  };
+}
+
 // Fake data for demonstration
-const MOCK_DATA = {
+const MOCK_DATA: DashboardData = {
   documentCounts: {
     text: 24,
     image: 17,
@@ -83,40 +135,56 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(MOCK_DATA);
   const [showInfoBanner, setShowInfoBanner] = useState(true);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   // Fetch dashboard data from API
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      // Try to fetch real data from API
       try {
-        setLoading(true);
-        
-        // Try to fetch real data from API
-        try {
-          const response = await api.get('/api/dashboard/metrics');
-          if (response.data) {
-            setDashboardData(response.data);
-            console.log("Loaded dashboard data from API");
-          } else {
-            // Fallback to mock data if API returns empty response
-            console.log("API returned empty response, using mock data");
-            setDashboardData(MOCK_DATA);
-          }
-        } catch (apiError) {
-          // If API call fails, use mock data
-          console.warn("API call failed, using mock data:", apiError);
+        const response = await api.get('/api/dashboard/metrics');
+        if (response.data) {
+          setDashboardData(response.data);
+          console.log("Loaded dashboard data from API");
+        } else {
+          // Fallback to mock data if API returns empty response
+          console.log("API returned empty response, using mock data");
           setDashboardData(MOCK_DATA);
         }
-        
-        setLoading(false);
-      } catch (error) {
-        console.error("Error in dashboard data loading:", error);
+      } catch (apiError) {
+        // If API call fails, use mock data
+        console.warn("API call failed, using mock data:", apiError);
         setDashboardData(MOCK_DATA);
-        setLoading(false);
       }
-    };
+      
+      setLastUpdated(new Date());
+      setLoading(false);
+    } catch (error) {
+      console.error("Error in dashboard data loading:", error);
+      setDashboardData(MOCK_DATA);
+      setLoading(false);
+    }
+  };
 
+  // Initial data load
+  useEffect(() => {
     fetchData();
   }, []);
+  
+  // Auto-refresh setup
+  useEffect(() => {
+    if (!autoRefresh) return;
+    
+    const interval = setInterval(() => {
+      console.log("Auto-refreshing dashboard data");
+      fetchData();
+    }, 30000); // Refresh every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
 
   // Format timestamp to readable date
   const formatDate = (timestamp: string) => {
@@ -171,7 +239,46 @@ export default function DashboardPage() {
         </Alert>
       )}
       
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        
+        <div className="flex items-center space-x-4 mt-4 sm:mt-0">
+          <div className="flex items-center text-sm">
+            <span className="text-muted-foreground mr-2">Last updated:</span>
+            <span>{lastUpdated.toLocaleTimeString()}</span>
+          </div>
+          
+          <button 
+            onClick={fetchData} 
+            className="flex items-center px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            disabled={loading}
+          >
+            <svg 
+              className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+          
+          <div className="flex items-center">
+            <input 
+              id="autoRefresh" 
+              type="checkbox" 
+              checked={autoRefresh} 
+              onChange={(e) => setAutoRefresh(e.target.checked)} 
+              className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600"
+            />
+            <label htmlFor="autoRefresh" className="text-sm cursor-pointer">
+              Auto-refresh
+            </label>
+          </div>
+        </div>
+      </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-8">
         <TabsList className="mb-4">
@@ -327,13 +434,13 @@ export default function DashboardPage() {
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }: { name: string, percent: number }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                       >
                         {dashboardData.documentTypeData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => [`${value} documents`, 'Count']} />
+                      <Tooltip formatter={(value: any) => [`${value} documents`, 'Count']} />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
@@ -355,7 +462,7 @@ export default function DashboardPage() {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="day" />
                       <YAxis />
-                      <Tooltip formatter={(value) => [`${value} documents`, 'Processed']} />
+                      <Tooltip formatter={(value: any) => [`${value} documents`, 'Processed']} />
                       <Bar dataKey="count" fill="#3b82f6" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -465,10 +572,12 @@ export default function DashboardPage() {
                   ) : (
                     <div className="space-y-4">
                       <div className="flex items-center space-x-2">
-                        <div className="h-4 w-4 rounded-full bg-green-500"></div>
+                        <div className={`h-4 w-4 rounded-full ${dashboardData.langsmithStatus?.connected ? 'bg-green-500' : 'bg-red-500'}`}></div>
                         <div>
-                          <p className="font-medium">Connected</p>
-                          <p className="text-sm text-muted-foreground">Project: demo_crew</p>
+                          <p className="font-medium">{dashboardData.langsmithStatus?.connected ? 'Connected' : 'Disconnected'}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Project: {dashboardData.langsmithStatus?.project || 'Not configured'}
+                          </p>
                         </div>
                       </div>
                       
