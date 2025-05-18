@@ -25,6 +25,9 @@ def setup_langsmith() -> Optional[Client]:
     Returns:
         Optional[Client]: LangSmith client if configured, None otherwise
     """
+    # Load environment variables from .env file
+    load_dotenv()
+    
     # First check if LangSmith library is available
     if not LANGSMITH_AVAILABLE:
         print("LangSmith tracing is not available - langsmith package not installed.")
@@ -34,8 +37,12 @@ def setup_langsmith() -> Optional[Client]:
     api_key = os.environ.get("LANGCHAIN_API_KEY")
     tracing_enabled = os.environ.get("LANGCHAIN_TRACING_V2", "false").lower() == "true"
     
-    if not api_key or not tracing_enabled:
-        print("LangSmith tracing is not enabled. Set LANGCHAIN_API_KEY and LANGCHAIN_TRACING_V2=true to enable.")
+    if not api_key:
+        print("LangSmith API key not found. Please set LANGCHAIN_API_KEY in .env file.")
+        return None
+        
+    if not tracing_enabled:
+        print("LangSmith tracing is not enabled. Set LANGCHAIN_TRACING_V2=true to enable.")
         return None
     
     try:

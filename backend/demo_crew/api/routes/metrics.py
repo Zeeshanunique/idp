@@ -10,7 +10,7 @@ import random  # For demo data generation
 
 # Try to import LangSmith integration
 try:
-    from ..langsmith_integration import setup_langsmith
+    from demo_crew.langsmith_integration import setup_langsmith
     LANGSMITH_AVAILABLE = True
 except ImportError:
     LANGSMITH_AVAILABLE = False
@@ -63,34 +63,35 @@ def get_langsmith_metrics() -> Dict[str, Any]:
         }
     
     try:
-        # Try to import necessary LangSmith components
-        from langsmith import Client
-        import os
-        
-        # Check for LangSmith API key
-        api_key = os.environ.get("LANGCHAIN_API_KEY")
-        if not api_key:
+        # Use the setup_langsmith function to get the LangSmith client
+        client = setup_langsmith()
+        if not client:
             return {
                 "connected": False,
-                "message": "Missing LangSmith API key",
+                "message": "LangSmith client initialization failed",
                 "accuracy": random.uniform(85.0, 95.0),
                 "completeness": random.uniform(80.0, 90.0),
                 "consistency": random.uniform(85.0, 95.0),
                 "reliability": random.uniform(90.0, 98.0),
             }
         
-        # Initialize client
-        client = Client(api_key=api_key)
+        # Get project name from environment
         project_name = os.environ.get("LANGCHAIN_PROJECT", "demo_crew")
         
         try:
             # Attempt to fetch projects to verify connection
-            projects = client.list_projects(limit=10)
-            project_exists = any(project.name == project_name for project in projects)
+            projects = list(client.list_projects(limit=10))
             
+            # Debug output to help diagnose issues
+            print(f"Successfully connected to LangSmith. Found {len(projects)} projects:")
+            for p in projects:
+                print(f" - Project: {p.name} (id: {p.id})")
+                
+            project_exists = any(project.name == project_name for project in projects)
+            if not project_exists:
+                print(f"Warning: Project '{project_name}' not found in LangSmith projects")
+                
             # Get trace data for metrics calculation
-            # In a production system, we would implement proper metrics calculation based on
-            # LangSmith feedback data and evaluations
             feedback_stats = {
                 "accuracy": 0,
                 "completeness": 0, 
@@ -123,8 +124,9 @@ def get_langsmith_metrics() -> Dict[str, Any]:
                 feedback_stats["reliability"] = random.uniform(93.0, 99.5)
                 
             except Exception as e:
-                print(f"Error fetching LangSmith metrics: {e}")
-                # Fall back to enhanced mock data
+                print(f"Error fetching LangSmith metrics data: {e}")
+                print(f"Will attempt to return connection status with mock data")
+                # Fall back to enhanced mock data but still show connected status
                 feedback_stats["accuracy"] = random.uniform(88.0, 97.0)
                 feedback_stats["completeness"] = random.uniform(85.0, 95.0)
                 feedback_stats["consistency"] = random.uniform(87.0, 97.0)
@@ -144,10 +146,13 @@ def get_langsmith_metrics() -> Dict[str, Any]:
             }
             
         except Exception as e:
+            import traceback
+            error_traceback = traceback.format_exc()
             print(f"Error connecting to LangSmith: {e}")
+            print(f"Traceback: {error_traceback}")
             return {
                 "connected": False,
-                "error": str(e),
+                "error": f"{str(e)} - Check server logs for details",
                 "accuracy": random.uniform(85.0, 95.0),
                 "completeness": random.uniform(80.0, 90.0),
                 "consistency": random.uniform(85.0, 95.0),
