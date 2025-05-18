@@ -1,37 +1,121 @@
-import { Dataset } from './dataset-utils';
+import { Dataset, DatasetItem } from './dataset-utils';
 
 /**
- * Converts a dataset to CSV format
- * Handles nested JSON objects and arrays properly
+ * Converts a dataset to CSV format with improved handling of complex data
+ * Produces a readable CSV with proper escaping and structure
  */
 export function convertToCSV(dataset: Dataset): string {
   if (!dataset.results || dataset.results.length === 0) {
-    return 'agent_type,output';
+    return 'agent_type,raw_json,primary_content';
   }
   
-  // Create header row (always include agent_type and output)
-  const header = 'agent_type,output';
+  // Create header row
+  const header = 'agent_type,raw_json,primary_content';
   
   // Create data rows
   const rows = dataset.results.map(item => {
-    // Convert output to string if it's not already
-    const outputStr = typeof item.output === 'string'
-      ? item.output
-      : JSON.stringify(item.output, null, 0); // Use compact JSON stringify
+    // Always include the full raw JSON for complete data preservation
+    const rawJson = JSON.stringify(item.output).replace(/"/g, '""');
     
-    // Escape quotes in output by doubling them (CSV standard)
-    const escapedOutput = outputStr.replace(/"/g, '""');
+    // Extract a readable primary content for human consumption
+    let primaryContent = extractPrimaryContent(item);
+    primaryContent = primaryContent.replace(/"/g, '""');
     
-    // Wrap output in quotes to handle newlines and commas
-    return `${item.agent_type},"${escapedOutput}"`;
+    // Format the CSV row with agent_type, raw_json for complete data, and human-readable content
+    return `${item.agent_type},"${rawJson}","${primaryContent}"`;
   });
   
   return [header, ...rows].join('\n');
 }
 
 /**
+ * Extract the most meaningful text content from a dataset item
+ * This helps make the CSV human-readable alongside the full JSON data
+ */
+function extractPrimaryContent(item: DatasetItem): string {
+  const output = item.output;
+  
+  // Handle string output directly
+  if (typeof output === 'string') {
+    return output;
+  }
+  
+  // Handle null/undefined
+  if (output === null || output === undefined) {
+    return '';
+  }
+  
+  // Handle complex objects based on agent_type
+  if (typeof output === 'object') {
+    // Audio agent - get transcription text
+    if (item.agent_type === 'audio' && output.transcription && output.transcription.text) {
+      return output.transcription.text;
+    }
+    
+    // Handle analysis output - look for transcript or summary
+    if (output.analysis) {
+      if (typeof output.analysis === 'string') {
+        return output.analysis;
+      }
+      
+      // Try common fields in analysis objects
+      if (output.analysis.transcript) return output.analysis.transcript;
+      if (output.analysis.summary) return output.analysis.summary;
+      if (output.analysis.description) return output.analysis.description;
+    }
+    
+    // General case - search for common text fields
+    const textFieldNames = ['text', 'content', 'transcript', 'summary', 'description', 'message'];
+    
+    // Search for the first available text field
+    for (const fieldName of textFieldNames) {
+      if (output[fieldName] && typeof output[fieldName] === 'string') {
+        return output[fieldName];
+      }
+    }
+    
+    // Deep search for text content
+    const textContent = findTextContent(output);
+    if (textContent) return textContent;
+    
+    // If we can't find meaningful text, return a summary of what the data contains
+    return `[Complex data with keys: ${Object.keys(output).join(', ')}]`;
+  }
+  
+  // Fallback for other types
+  return String(output);
+}
+
+/**
+ * Recursively search for text content in an object
+ */
+function findTextContent(obj: any, maxDepth = 3, currentDepth = 0): string {
+  // Prevent excessive recursion
+  if (currentDepth >= maxDepth) return '';
+  if (!obj || typeof obj !== 'object') return '';
+  
+  // Look for common text field names
+  const textFields = ['text', 'content', 'description', 'transcript', 'summary', 'message'];
+  for (const key of textFields) {
+    if (typeof obj[key] === 'string' && obj[key].trim().length > 0) {
+      return obj[key];
+    }
+  }
+  
+  // Recursively check nested objects
+  for (const key in obj) {
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      const found = findTextContent(obj[key], maxDepth, currentDepth + 1);
+      if (found) return found;
+    }
+  }
+  
+  return '';
+}
+
+/**
  * Converts a dataset to XML format
- * Handles nested JSON objects and arrays properly
+ * Creates a properly structured XML with descriptive element names
  */
 export function convertToXML(dataset: Dataset): string {
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<dataset>\n';
@@ -45,7 +129,47 @@ export function convertToXML(dataset: Dataset): string {
       xml += `    <output>${escapeXML(item.output)}</output>\n`;
     } else if (typeof item.output === 'object' && item.output !== null) {
       xml += '    <output>\n';
-      xml += jsonToXML(item.output, 6); // 6 spaces indentation
+      
+      // Handle audio agent output specially
+      if (item.agent_type === 'audio' && item.output.transcription) {
+        xml += '      <transcription>\n';
+        
+        // Add transcript text
+        if (item.output.transcription.text) {
+          xml += `        <text>${escapeXML(item.output.transcription.text)}</text>\n`;
+        }
+        
+        // Add segments if available
+        if (item.output.transcription.segments && Array.isArray(item.output.transcription.segments)) {
+          xml += '        <segments>\n';
+          
+          item.output.transcription.segments.forEach((segment: any, idx: number) => {
+            xml += '          <segment>\n';
+            xml += `            <id>${segment.id !== undefined ? segment.id : idx}</id>\n`;
+            xml += `            <start>${segment.start !== undefined ? segment.start : 0}</start>\n`;
+            xml += `            <end>${segment.end !== undefined ? segment.end : 0}</end>\n`;
+            xml += `            <text>${escapeXML(segment.text || '')}</text>\n`;
+            xml += `            <confidence>${segment.confidence !== undefined ? segment.confidence : 1}</confidence>\n`;
+            xml += '          </segment>\n';
+          });
+          
+          xml += '        </segments>\n';
+        }
+        
+        xml += '      </transcription>\n';
+        
+        // Add analysis if available 
+        if (item.output.analysis) {
+          xml += '      <analysis>\n';
+          xml += jsonToXML(item.output.analysis, 8); 
+          xml += '      </analysis>\n';
+        }
+      } 
+      // General case for other structured data
+      else {
+        xml += jsonToXML(item.output, 6); 
+      }
+      
       xml += '    </output>\n';
     } else {
       xml += `    <output>${escapeXML(String(item.output))}</output>\n`;
@@ -60,13 +184,15 @@ export function convertToXML(dataset: Dataset): string {
 
 /**
  * Helper function to convert a JSON object to XML
- * Handles complex nested objects and arrays
+ * Handles complex nested objects and arrays with improved formatting
  */
 function jsonToXML(obj: any, indent: number = 0): string {
   const spaces = ' '.repeat(indent);
   let xml = '';
   
-  if (Array.isArray(obj)) {
+  if (obj === null || obj === undefined) {
+    xml += `${spaces}<null/>\n`;
+  } else if (Array.isArray(obj)) {
     obj.forEach((item, index) => {
       xml += `${spaces}<item index="${index}">\n`;
       if (typeof item === 'object' && item !== null) {
@@ -76,29 +202,47 @@ function jsonToXML(obj: any, indent: number = 0): string {
       }
       xml += `${spaces}</item>\n`;
     });
-  } else if (obj === null) {
-    xml += `${spaces}<null/>\n`;
   } else if (typeof obj === 'object') {
     Object.entries(obj).forEach(([key, value]) => {
+      // Skip undefined values
+      if (value === undefined) return;
+      
       // Convert key to valid XML tag (remove spaces, special chars)
-      const safeKey = key.replace(/[^a-zA-Z0-9_]/g, '_').replace(/^[^a-zA-Z_]+/, '_');
+      const safeKey = getSafeXmlTag(key);
       
       if (value === null) {
-        xml += `${spaces}<${safeKey} xsi:nil="true"/>\n`;
+        xml += `${spaces}<${safeKey} nil="true"/>\n`;
       } else if (typeof value === 'object') {
         xml += `${spaces}<${safeKey}>\n`;
         xml += jsonToXML(value, indent + 2);
         xml += `${spaces}</${safeKey}>\n`;
       } else {
+        // For primitive values
         xml += `${spaces}<${safeKey}>${escapeXML(String(value))}</${safeKey}>\n`;
       }
     });
   } else {
-    // This should not happen if the function is called correctly
+    // For primitive values when called directly
     xml += `${spaces}${escapeXML(String(obj))}\n`;
   }
   
   return xml;
+}
+
+/**
+ * Creates a safe XML tag name from a string
+ * Handles special characters and ensures valid XML tag names
+ */
+function getSafeXmlTag(key: string): string {
+  // Replace spaces and special characters with underscores
+  let safeKey = key.replace(/[^a-zA-Z0-9_]/g, '_');
+  
+  // XML tags can't start with numbers or certain characters
+  if (/^[0-9]/.test(safeKey) || safeKey === '') {
+    safeKey = '_' + safeKey;
+  }
+  
+  return safeKey;
 }
 
 /**
@@ -110,7 +254,20 @@ export function convertToText(dataset: Dataset): string {
   dataset.results.forEach((item, index) => {
     text += `ENTRY ${index + 1}\n`;
     text += `Type: ${item.agent_type}\n`;
-    text += `Output:\n${item.output}\n\n`;
+    
+    // Format output based on its type
+    let outputText = '';
+    if (typeof item.output === 'object') {
+      try {
+        outputText = JSON.stringify(item.output, null, 2);
+      } catch (e) {
+        outputText = String(item.output);
+      }
+    } else {
+      outputText = String(item.output || '');
+    }
+    
+    text += `Output:\n${outputText}\n\n`;
     text += '----------------------------\n\n';
   });
   
@@ -131,81 +288,118 @@ function escapeXML(unsafe: string): string {
 
 /**
  * Parse CSV text into a Dataset object
+ * Handles both the new 3-column format and older 2-column format
  */
 export function parseCSV(csv: string): Dataset {
   const lines = csv.split('\n').filter(line => line.trim() !== '');
-  const results = [];
+  const results: DatasetItem[] = [];
+  
+  if (lines.length === 0) {
+    return { results: [] };
+  }
+  
+  // Parse header to detect format
+  const header = lines[0].toLowerCase();
+  const isThreeColumnFormat = header.includes('raw_json') && header.includes('primary_content');
   
   // Skip header
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
     
-    // Handle quoted CSV properly
-    let inQuotes = false;
-    let currentField = '';
-    const fields = [];
+    // Parse CSV line into fields
+    const fields = parseCSVLine(line);
     
-    for (let j = 0; j < line.length; j++) {
-      const char = line[j];
-      
-      if (char === '"') {
-        // If this is a double quote inside quotes, add a single quote
-        if (inQuotes && j + 1 < line.length && line[j + 1] === '"') {
-          currentField += '"';
-          j++; // Skip the next quote
+    if (fields.length < 2) continue; // Skip invalid lines
+    
+    let agentType = fields[0];
+    let output: any;
+    
+    if (isThreeColumnFormat && fields.length >= 3) {
+      // In 3-column format, the second column contains the raw JSON
+      try {
+        output = JSON.parse(fields[1]);
+      } catch (e) {
+        console.warn('Failed to parse JSON in CSV raw_json field:', e);
+        // Fall back to using the third column (primary_content) as a string
+        output = fields.length >= 3 ? fields[2] : fields[1];
+      }
+    } else {
+      // Legacy 2-column format - try to parse the second column as JSON if applicable
+      try {
+        // Check if it looks like JSON
+        if ((fields[1].trim().startsWith('{') && fields[1].trim().endsWith('}')) || 
+            (fields[1].trim().startsWith('[') && fields[1].trim().endsWith(']'))) {
+          output = JSON.parse(fields[1]);
         } else {
-          // Toggle the in-quotes flag
-          inQuotes = !inQuotes;
+          output = fields[1];
         }
-      } else if (char === ',' && !inQuotes) {
-        // End of field
-        fields.push(currentField);
-        currentField = '';
-      } else {
-        // Add character to current field
-        currentField += char;
+      } catch (e) {
+        console.warn('Failed to parse JSON in CSV:', e);
+        output = fields[1];
       }
     }
     
-    // Add the last field
-    fields.push(currentField);
-    
-    // Try to parse the output as JSON if it looks like JSON
-    if (fields.length >= 2) {
-      let output = fields[1];
-      
-      // Try to parse as JSON if it starts with { or [
-      if ((output.trim().startsWith('{') && output.trim().endsWith('}')) || 
-          (output.trim().startsWith('[') && output.trim().endsWith(']'))) {
-        try {
-          output = JSON.parse(output);
-        } catch (e) {
-          // If parsing fails, keep it as a string
-          console.log('Failed to parse JSON in CSV:', e);
-        }
-      }
-      
-      results.push({
-        agent_type: fields[0],
-        output: output
-      });
-    }
+    results.push({
+      agent_type: agentType,
+      output: output
+    });
   }
   
   return { results };
 }
 
 /**
+ * Parse a single CSV line, handling quoted fields correctly
+ */
+function parseCSVLine(line: string): string[] {
+  const fields: string[] = [];
+  let inQuotes = false;
+  let currentField = '';
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      // Check if this is an escaped quote (two double quotes in a row)
+      if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+        currentField += '"';
+        i++; // Skip the next quote
+      } else {
+        // Toggle quote mode
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      // End of field
+      fields.push(currentField);
+      currentField = '';
+    } else {
+      // Add character to current field
+      currentField += char;
+    }
+  }
+  
+  // Add the last field
+  fields.push(currentField);
+  
+  return fields;
+}
+
+/**
  * Parse XML text into a Dataset object
- * This is a basic implementation that handles the structure created by convertToXML
+ * This handles both the old r/o tag format and the new result/output tag format
  */
 export function parseXML(xml: string): Dataset {
-  const results: any[] = [];
+  const results: DatasetItem[] = [];
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xml, "text/xml");
   
-  // Get all result elements
-  const resultElements = xmlDoc.getElementsByTagName('result');
+  // Try new format first (result tags)
+  let resultElements = xmlDoc.getElementsByTagName('result');
+  
+  // If no results found with new tags, try old format (r tags) 
+  if (resultElements.length === 0) {
+    resultElements = xmlDoc.getElementsByTagName('r');
+  }
   
   for (let i = 0; i < resultElements.length; i++) {
     const resultElement = resultElements[i];
@@ -214,28 +408,35 @@ export function parseXML(xml: string): Dataset {
     const agentTypeElement = resultElement.getElementsByTagName('agent_type')[0];
     const agentType = agentTypeElement ? agentTypeElement.textContent || '' : '';
     
-    // Get output
-    const outputElement = resultElement.getElementsByTagName('output')[0];
-    let output = '';
+    // Get output - try new format first
+    let outputElement: Element | null = resultElement.getElementsByTagName('output')[0] || null;
+    
+    // If not found, try old format
+    if (!outputElement) {
+      outputElement = resultElement.getElementsByTagName('o')[0] || null;
+    }
+    
+    let outputData: any = '';
     
     if (outputElement) {
       // Check if the output has child elements that would indicate JSON structure
       if (outputElement.children.length > 0) {
         try {
           // Try to reconstruct the JSON from XML structure
-          output = xmlElementToJson(outputElement);
+          outputData = xmlElementToJson(outputElement);
         } catch (e) {
           // If parsing fails, use the text content
-          output = outputElement.textContent || '';
+          console.error('Failed to parse XML to JSON:', e);
+          outputData = outputElement.textContent || '';
         }
       } else {
-        output = outputElement.textContent || '';
+        outputData = outputElement.textContent || '';
       }
     }
     
     results.push({
       agent_type: agentType,
-      output: output
+      output: outputData
     });
   }
   
