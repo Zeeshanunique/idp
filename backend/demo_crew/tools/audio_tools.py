@@ -169,13 +169,15 @@ Follow these guidelines:
                                     # If we have segments, process them
                                     if hasattr(response, 'segments'):
                                         for idx, segment in enumerate(response.segments):
-                                            segments.append({
+                                            # Fix: Handle segment objects properly based on their actual structure
+                                            segment_data = {
                                                 "id": idx,
-                                                "start": segment.get('start', 0),
-                                                "end": segment.get('end', 0),
-                                                "text": segment.get('text', ''),
-                                                "confidence": segment.get('confidence', 1.0)
-                                            })
+                                                "start": getattr(segment, 'start', 0),
+                                                "end": getattr(segment, 'end', 0),
+                                                "text": getattr(segment, 'text', ''),
+                                                "confidence": getattr(segment, 'confidence', 1.0)
+                                            }
+                                            segments.append(segment_data)
                                     
                                     return {
                                         "text": main_text,

@@ -1,8 +1,0 @@
-INFO:demo_crew.tools.langchain_utils:LangChain version 0.2.17 loaded successfully
-WARNING:demo_crew.tools:Failed to load TextProcessor: cannot import name 'ChatPrompTemplate' from 'demo_crew.tools.langchain_utils' (/workspaces/idp/backend/demo_crew/tools/langchain_utils.py)
-INFO:demo_crew.tools:ImageProcessor loaded successfully
-INFO:demo_crew.tools:AudioProcessor loaded successfully
-INFO:demo_crew.tools:VideoProcessor loaded successfully
-Warning: Local whisper is not available. Will use OpenAI API for transcription.
-OpenAI API client initialized with key: sk-proj-...bYEA
-Warning: Using a project-scoped API key (sk-proj-). These keys may not work with audio transcription.
